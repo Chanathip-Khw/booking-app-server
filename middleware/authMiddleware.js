@@ -1,19 +1,32 @@
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 
-const authMiddleware = (req, res, next) => {
-  const token = req.header('Authorization')?.split(' ')[1];
+// Secret key for JWT
+const SECRET_KEY = process.env.JWT_SECRET;
+const REFRESH_SECRET_KEY =
+  process.env.JWT_REFRESH_SECRET;
 
-  if (!token) {
-    return res.status(401).json({ message: 'No token, authorization denied' });
-  }
+// Middleware to authenticate JWT token
+export const authenticateToken = (req, res, next) => {
+  const token = req.headers["authorization"]?.split(" ")[1];
+  if (!token) return res.sendStatus(401);
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+  jwt.verify(token, SECRET_KEY, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
     next();
-  } catch (error) {
-    res.status(401).json({ message: 'Token is not valid' });
-  }
+  });
 };
 
-export default authMiddleware;
+// Middleware to authenticate refresh token
+export const authenticateRefreshToken = (req, res, next) => {
+  const token = req.body.refreshToken;
+  if (!token) return res.sendStatus(401);
+
+  jwt.verify(token, REFRESH_SECRET_KEY, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+};
+
+export default { authenticateToken, authenticateRefreshToken };
