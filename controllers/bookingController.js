@@ -1,12 +1,10 @@
 import pool from "../db.js";
 
-// Book a date
 export const bookDate = async (req, res) => {
   const { checkinDate, checkoutDate, name, phoneNumber, email } = req.body;
   const userId = req.user.id;
 
   try {
-    // Insert booking into the database
     await pool.query(
       "INSERT INTO bookings (user_id, checkin_date, checkout_date, name, phone_number, email, created_at) VALUES ($1, $2, $3, $4, $5, $6, NOW())",
       [userId, checkinDate, checkoutDate, name, phoneNumber, email]
@@ -19,7 +17,6 @@ export const bookDate = async (req, res) => {
   }
 };
 
-// Get all bookings
 export const getBookings = async (req, res) => {
   try {
     const bookings = await pool.query(
