@@ -22,7 +22,9 @@ export const bookDate = async (req, res) => {
 // Get all bookings
 export const getBookings = async (req, res) => {
   try {
-    const bookings = await pool.query("SELECT * FROM bookings");
+    const bookings = await pool.query(
+      "SELECT * FROM bookings WHERE checkout_date >= CURRENT_DATE"
+    );
     res.status(200).json(bookings.rows);
   } catch (error) {
     console.error("Error in getBookings:", error);
